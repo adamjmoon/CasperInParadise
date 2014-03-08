@@ -1,0 +1,3 @@
+scraped = {}
+
+module.exports = scraped

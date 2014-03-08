@@ -1,0 +1,16 @@
+{
+  "name": "CasperParallel",
+  "version": "1.0.0",
+  "dependencies": {
+    "growl": "latest",
+    "grunt": "latest",
+    "async" : "latest",
+    "lodash" : "latest",
+    "pdfkit" : "latest",
+    "colors" : "latest",
+    "grunt-contrib-clean": "latest"
+  },
+    "scripts": {
+      "preinstall": "npm i -g grunt-cli"
+    }
+}
