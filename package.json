@@ -8,6 +8,7 @@
     "lodash" : "latest",
     "pdfkit" : "latest",
     "colors" : "latest",
+    "casperjs" : "latest",
     "grunt-contrib-clean": "latest"
   },
     "scripts": {

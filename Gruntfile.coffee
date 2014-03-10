@@ -12,7 +12,6 @@ module.exports = (grunt) ->
   stats = require "./common/stats.coffee"
   stats.failures = 1
 
-  console.log common.prop = 3
   argProject = grunt.option('proj')
   common.setProject(argProject)
   workList = []
@@ -21,7 +20,7 @@ module.exports = (grunt) ->
   argUserAgentType = grunt.option('userAgent')
   successCount = 0
   failedCount = 0
-  commandTxt = 'casperjs.bat casperTestRunner.coffee '
+  commandTxt = './node_modules/.bin/casperjs casperTestRunner.coffee'
   grunt.loadNpmTasks 'grunt-contrib-clean'
 
   # Configure Grunt
@@ -38,10 +37,13 @@ module.exports = (grunt) ->
       setupWorkForScenario argScenario, deviceType, cb
     else
       for scenario of common.criteriaList
-        setupWorkForScenario scenario, deviceType, cb
+        if common.criteriaList[scenario].filter
+            if common.criteriaList[scenario].filter[deviceType]
+                setupWorkForScenario scenario, deviceType, cb
+        else
+            setupWorkForScenario scenario, deviceType, cb
 
   setupWorkForScenario = (scenario, deviceType, cb) ->
-    if common.criteriaList[scenario].forDeviceType is deviceType or !common.criteriaList[scenario].forDeviceType
       i = 0
       while i < common.viewPorts[deviceType].list.length
         if argUserAgentType
@@ -52,9 +54,8 @@ module.exports = (grunt) ->
           # pass actual userAgent string
           args.push '--engine=' + common.browserEngine
           args.push common
-          console.log args
 
-#          workList.push async.apply(cmd, common.getCasperJsExec(), args, cb)
+    #          workList.push async.apply(cmd, common.getCasperJsExec(), args, cb)
         else
           for userAgentType of common.userAgents[deviceType]
             args = ['casperTestRunner.coffee', common.currentProject, scenario, deviceType, common.viewPorts[deviceType].list[i][0],
@@ -64,7 +65,6 @@ module.exports = (grunt) ->
             # pass actual userAgent string
             args.push '--engine=' + common.browserEngine
             args.push common
-            console.log args
             workList.push async.apply(cmd, common.getCasperJsExec(), args, cb)
         i++
 
@@ -87,7 +87,7 @@ module.exports = (grunt) ->
 #        if failedMsg.length > 0
 #          console.log failedMsg .red
 
-        console.log scraped
+        #console.log scraped
         cb()
 
     if argDeviceType
@@ -96,7 +96,6 @@ module.exports = (grunt) ->
       setupWork('phone', callback) if common.viewPorts['phone'].active
       setupWork('tablet', callback) if common.viewPorts.tablet.active
       setupWork('desktop', callback) if common.viewPorts.desktop.active
-
     async.parallel workList,
       callback
 

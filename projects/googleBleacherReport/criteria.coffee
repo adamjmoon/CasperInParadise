@@ -1,5 +1,6 @@
 #    common criteria list
 criteriaList = {}
+forDeviceType= {}
 criteriaList.googleSearch =
   bdd:
     GIVEN: 'Browsed to google.com'
@@ -15,7 +16,7 @@ criteriaList.navigateToBleachReportNavLink  =
       GIVEN: 'Browsed to site from google search result link'
       WHEN: 'Nav Toggle Button clicked'
       THEN: 'Side nav should be visible'
-    forDeviceType: "phone"
+    forDeviceType: {phone: true, tablet: true}
     steps: ['browseToSearchResult','clickCloseDownloadAppHeader', 'clickNavToggleBtn']
 
 criteriaList.navigateToWWEHome  =

@@ -1,22 +1,21 @@
 
 require = patchRequire global.require
-#x = require('casper').selectXPath
-#common = require "./common/config.coffee"
+x = require('casper').selectXPath
+common = require "./common/config.coffee"
 casper = require('casper').create
     verbose: true
     logLevel: 'error'
     waitTimeout: 5000
 requestedProject = casper.cli.get(0)
 scraped = require "./common/scraped.coffee"
-
+scraped.html = ''
+common.setProject(requestedProject)
 scenario = casper.cli.get(1)
 deviceType = casper.cli.get(2)
 width = casper.cli.get(3)
 height = casper.cli.get(4)
 userAgentType = casper.cli.get(5)
-common = casper.cli.get(7)
-console.log common
-common.prop = 4
+
 url = common.proj.url
 
 steps = []
@@ -45,28 +44,19 @@ casper.show = (selector) ->
     document.querySelector(selector).style.display = "block !important;"
   ), selector
 
-scrapeHtml = (c, step) ->
-#  console.log c.getHTML()
-  fs.writeFile common.dirSuccess + ACfilename.replace(/{step}/, currentStep + '-' + step) + '.html', scrape, (err) ->
-  done = this.async
-  return
-
-captureScreenshots = (c, step, dir) ->
-  c.capture dir + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
-      top: 0
-      left: 0
-      width: width
-      height: height
-
-  if common.includeFullPage then c.captureSelector dir + FPfilename.replace(/{step}/g, currentStep + '-' + step) + '.png', 'html'
-  done()
-  done = this.async
-  return
 
 
 pass = (c, step)->
-  scraped[step] = c.getHTML()
-  captureScreenshots(c,step, common.dirSuccess)
+  #console.log 'step -> ' + step + ' html:\n' + c.getHTML()
+  console.log common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png'
+  c.capture common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
+    top: 0
+    left: 0
+    width: width
+    height: height
+
+  if common.includeFullPage 
+  then c.captureSelector common.dirSuccess + FPfilename.replace(/{step}/g, currentStep + '-' + step) + '.png', 'html'
 
 
   common.logWithTime scenario, step, ' snapshot taken after pass'
@@ -75,12 +65,12 @@ pass = (c, step)->
   return
 
 fail = (c, step) ->
-  c.capture common.dirFailure + ACfilename.replace(/{step}/g, currentStep + '-' + step),
+  c.capture common.dirFailure + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
     left: 0
     width: width
     height: height
-  c.captureSelector common.dirFailure + FPfilename.replace(/\{step\}/, currentStep + '-' + step), 'body'
+  c.captureSelector common.dirFailure + FPfilename.replace(/\{step\}/g, currentStep + '-' + step) + '.png', 'body'
 
   common.logWithTime scenario, step, ' snapshot taken after failure'
   failedCount = failedCount + 1
