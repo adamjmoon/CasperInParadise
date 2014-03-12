@@ -1,3 +1,0 @@
-scraped = {}
-
-module.exports = scraped

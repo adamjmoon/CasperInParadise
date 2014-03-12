@@ -1,5 +1,5 @@
 #    common project specific configurations
 c = {}
-c.url = 'http://www.etsy.com/shop/ZdaySurvivor47'
+c.url = 'http://www.etsy.com'
 
 module.exports = c

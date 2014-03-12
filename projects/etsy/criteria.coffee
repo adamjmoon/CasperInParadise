@@ -9,12 +9,16 @@ criteria["browseToHome"] =
     THEN: 'store title should be visible'
   steps: ['browseToHome']
 
-criteria["browseToHome.phone"] =
+criteria["browseToHome_phone"] =
   filter: filters.phone
   bdd:
     GIVEN: 'Browsed to etsy store'
     THEN: 'store title should be visible'
-  steps: ['browseToHome.phone']
+  steps: ['browseToHomePhone']
+    
+criteria["closeHeader"] =
+  filter: filters.phone
+  steps: ['browseToHome_phone','closeAppHeader']
 
 
 module.exports = criteria

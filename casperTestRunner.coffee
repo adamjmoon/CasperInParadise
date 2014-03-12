@@ -2,19 +2,19 @@
 require = patchRequire global.require
 x = require('casper').selectXPath
 common = require "./common/config.coffee"
+console.log "here"
 casper = require('casper').create
     verbose: true
-    logLevel: 'error'
+    logLevel: 'debug'
     waitTimeout: 5000
 requestedProject = casper.cli.get(0)
-scraped = require "./common/scraped.coffee"
-scraped.html = ''
 common.setProject(requestedProject)
 scenario = casper.cli.get(1)
 deviceType = casper.cli.get(2)
 width = casper.cli.get(3)
 height = casper.cli.get(4)
 userAgentType = casper.cli.get(5)
+hammer = undefined
 
 url = common.proj.url
 
@@ -24,9 +24,19 @@ failedCount = 0
 successImgPath = ''
 failureImgPath = ''
 
+casper.tap = (selector) ->
+  @evaluate ->
+    el = document.querySelector(selector)
+    Hammer = hammer(el)
+    console.log Hammer
+    Hammer.trigger('tap', target: el)
+    return
+  return
+
 buildSteps = (scenario) ->
+  console.log common.criteriaList[scenario].steps
   for st in common.criteriaList[scenario].steps
-    if common.criteriaList[st] and common.criteriaList[st].steps.length > 1
+    if common.criteriaList[st] and common.criteriaList[st].steps.length >= 1
       buildSteps st
     else
       steps.push st
@@ -44,11 +54,8 @@ casper.show = (selector) ->
     document.querySelector(selector).style.display = "block !important;"
   ), selector
 
-
-
 pass = (c, step)->
-  #console.log 'step -> ' + step + ' html:\n' + c.getHTML()
-  console.log common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png'
+  console.log c.getHTML()
   c.capture common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
     left: 0
@@ -65,6 +72,8 @@ pass = (c, step)->
   return
 
 fail = (c, step) ->
+  console.log(step +' -> ' + '\n------------------------\n' + c.getHTML() + '\n-----------------------\n')
+  
   c.capture common.dirFailure + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
     left: 0
@@ -79,9 +88,10 @@ fail = (c, step) ->
 currentStep = 0
 
 runSteps = (c) ->
+  
   if steps[currentStep]
     step = steps[currentStep]
-    stepToRun = require(common.projPath + "scenarios/" + step + common.scenarioScriptExt)
+    stepToRun = require common.path + "scenarios/" + step + common.scenarioScriptExt
     common.logWithTime(scenario, currentStep + 1, ' run')
     stepToRun.run c, scenario, step, common, pass, fail, x
     currentStep++
@@ -91,9 +101,12 @@ casper.start url
 
 casper.then ->
   @viewport width, height
+  hammer = require "./node_modules/hammerjs/hammer.js"
+  
   return
 
 casper.then ->
+  console.log steps
   runSteps casper
   return
 
@@ -102,4 +115,4 @@ exitCode = ->
 
 casper.run ->
   exitCode = successCount*10 + failedCount
-  @echo("Exiting with exit code " + exitCode).exit(exitCode)
+  @exit(exitCode)

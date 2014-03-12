@@ -7,7 +7,7 @@ module.exports = (grunt) ->
   path = require('path')
   PDF = require 'pdfkit'
   growl = require('growl')
-  scraped = require "./common/scraped.coffee"
+  
   common = require "./common/config.coffee"
   stats = require "./common/stats.coffee"
   stats.failures = 1
@@ -53,9 +53,7 @@ module.exports = (grunt) ->
           args.push argUserAgentType
           # pass actual userAgent string
           args.push '--engine=' + common.browserEngine
-          args.push common
-
-    #          workList.push async.apply(cmd, common.getCasperJsExec(), args, cb)
+            
         else
           for userAgentType of common.userAgents[deviceType]
             args = ['casperTestRunner.coffee', common.currentProject, scenario, deviceType, common.viewPorts[deviceType].list[i][0],
@@ -133,10 +131,16 @@ module.exports = (grunt) ->
     doc
 
   cmd = (script, args, callback) ->
-    cmdProcess = spawn script, args, {stdio: 'inherit'}
+    fs = require('fs')
+    logFile = './logs/' + args[1] + '.' + args[2] +  '.' + args[6] + '.log'
+    out = fs.openSync(logFile, 'w')
+    err = out
+
+    cmdProcess = spawn script, args, {stdio: [ 'pipe', out, err ]}
 
     cmdProcess.on "exit", (code) ->
-      msg = '\ndeviceType: ' + args[5] + '\nviewport:  ' + args[4] + ' x ' + args[5] + '\n-----------------------------------\n'
+      
+      msg = '\ndeviceType: ' + args[3] + '\nviewport:  ' + args[4] + ' x ' + args[5] + '\n-----------------------------------\n'
       path = args[2] + '/' + args[3] + '/' + args[6] + '/' +  args[4] + 'x' + args[5] + '/'
       sPath = common.dirSuccess + path
       fPath = common.dirFailure + path
@@ -151,10 +155,9 @@ module.exports = (grunt) ->
             [args[4] , args[5]+25]
 
         if common.criteriaList[args[2]].bdd
-          scenarioTitle = scenarioTitle +
-            '\n\nGIVEN:\n--> ' + common.criteriaList[args[2]].bdd.GIVEN +
-            '\nWHEN:\n--> ' + common.criteriaList[args[2]].bdd.WHEN +
-            '\nTHEN:\n--> ' + common.criteriaList[args[2]].bdd.THEN
+          scenarioTitle += '\n\nGIVEN:\n--> ' + common.criteriaList[args[2]].bdd.GIVEN
+          if scenarioTitle then scenarioTitle += '\nWHEN:\n--> ' + common.criteriaList[args[2]].bdd.WHEN +
+          scenarioTitle += '\nTHEN:\n--> ' + common.criteriaList[args[2]].bdd.THEN
 
         doc.fontSize(16)
         .text(scenarioTitle,Math.floor(doc.page.width/12),Math.floor(doc.page.height/12),{width: Math.floor(doc.page.width*.9), align: 'left'})

@@ -26,6 +26,7 @@ config = ->
       self.dirFailure = self.dirFailure.replace('{project}', project)
       self.pdfResults = self.pdfResults.replace('{project}', project)
       self.projPath = '../projects/' + project + '/'
+      self.path = '../../../../projects/' + project + '/'
       self.currentProject = project  
       self.proj =  require(self.projPath + 'configProject.coffee')
       self.criteriaList =  require(self.projPath + 'criteria.coffee')
@@ -47,7 +48,7 @@ config = ->
       path
 
     @getCasperJsExec = () ->
-      "casperjs"
+      "./node_modules/.bin/casperjs"
     @logWithTime = (scenario, step, action) ->
       if self.verbose
         timeStamp = new Date()
