@@ -14,6 +14,8 @@ module.exports = (grunt) ->
 
   argProject = grunt.option('proj')
   common.setProject(argProject)
+  config = require "./projects/"+common.currentProject+"/config.coffee"
+  
   workList = []
   argScenario = grunt.option('scenario')
   argDeviceType = grunt.option('deviceType')
@@ -25,7 +27,7 @@ module.exports = (grunt) ->
 
   # Configure Grunt
   grunt.initConfig
-    clean: {options: {force: true}, all: [common.dirSuccess, common.dirFailure]}
+    clean: {options: {force: true}, all: ['results', 'logs']}
 
   grunt.registerTask 'testAcceptanceCriteria', 'RUN ALL CRITERIA', () ->
     run this.async()
@@ -36,9 +38,9 @@ module.exports = (grunt) ->
     if argScenario
       setupWorkForScenario argScenario, deviceType, cb
     else
-      for scenario of common.criteriaList
-        if common.criteriaList[scenario].filter
-            if common.criteriaList[scenario].filter[deviceType]
+      for scenario of config.criteriaList
+        if config.criteriaList[scenario].filter
+            if config.criteriaList[scenario].filter[deviceType]
                 setupWorkForScenario scenario, deviceType, cb
         else
             setupWorkForScenario scenario, deviceType, cb
@@ -63,7 +65,7 @@ module.exports = (grunt) ->
             # pass actual userAgent string
             args.push '--engine=' + common.browserEngine
             args.push common
-            workList.push async.apply(cmd, common.getCasperJsExec(), args, cb)
+            workList.push async.apply(cmd, common.utils.getCasperJsExec(), args, cb)
         i++
 
 
@@ -78,7 +80,7 @@ module.exports = (grunt) ->
         failedMsg = ''
         if failedCount > 0
           failedMsg = "FAILED STEPS: " + failedCount
-        doneMsg = common.getCasperJsExec() + ' COMPLETED for all criteria in : ' + ((endTime - startTime) / 1000).toFixed(3).toString() + ' seconds'
+        doneMsg = common.utils.getCasperJsExec() + ' COMPLETED for all criteria in : ' + ((endTime - startTime) / 1000).toFixed(3).toString() + ' seconds'
         growlMsg(doneMsg  .cyan)
 #        console.log doneMsg .cyan
 #        console.log successMsg .green
@@ -154,10 +156,10 @@ module.exports = (grunt) ->
           size:
             [args[4] , args[5]+25]
 
-        if common.criteriaList[args[2]].bdd
-          scenarioTitle += '\n\nGIVEN:\n--> ' + common.criteriaList[args[2]].bdd.GIVEN
+        if config.criteriaList[args[2]].bdd
+          scenarioTitle += '\n\nGIVEN:\n--> ' + config.criteriaList[args[2]].bdd.GIVEN
           if scenarioTitle then scenarioTitle += '\nWHEN:\n--> ' + common.criteriaList[args[2]].bdd.WHEN +
-          scenarioTitle += '\nTHEN:\n--> ' + common.criteriaList[args[2]].bdd.THEN
+          scenarioTitle += '\nTHEN:\n--> ' + config.criteriaList[args[2]].bdd.THEN
 
         doc.fontSize(16)
         .text(scenarioTitle,Math.floor(doc.page.width/12),Math.floor(doc.page.height/12),{width: Math.floor(doc.page.width*.9), align: 'left'})
@@ -171,10 +173,10 @@ module.exports = (grunt) ->
             doc.write sPath + pdfResult
         )
       if hadFailure
-        msg = 'COMPLETED ' + args[2] + ' but FAILED on Step ' + common.criteriaList[args[2]].steps[Math.floor( code / 10 )] + msg
+        msg = 'COMPLETED ' + args[2] + ' but FAILED on Step ' + config.criteriaList[args[2]].steps[Math.floor( code / 10 )] + msg
         console.log msg .red
       else
-        msg =  'COMPLETED All ' + common.criteriaList[args[2]].steps.length + ' Steps for ' + args[1] + ' Successfully '  + msg
+        msg =  'COMPLETED All ' + config.criteriaList[args[2]].steps.length + ' Steps for ' + args[1] + ' Successfully '  + msg
         console.log msg .green
       callback(null, "")
 

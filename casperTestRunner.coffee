@@ -1,14 +1,14 @@
-
 require = patchRequire global.require
 x = require('casper').selectXPath
-common = require "./common/config.coffee"
+
 console.log "here"
 casper = require('casper').create
     verbose: true
     logLevel: 'debug'
     waitTimeout: 5000
 requestedProject = casper.cli.get(0)
-common.setProject(requestedProject)
+common = require "./common/config.coffee"
+config = require "./projects/" + requestedProject +"/config.coffee"
 scenario = casper.cli.get(1)
 deviceType = casper.cli.get(2)
 width = casper.cli.get(3)
@@ -24,27 +24,27 @@ failedCount = 0
 successImgPath = ''
 failureImgPath = ''
 
-casper.tap = (selector) ->
-  @evaluate ->
-    el = document.querySelector(selector)
-    Hammer = hammer(el)
-    console.log Hammer
-    Hammer.trigger('tap', target: el)
-    return
-  return
+#casper.tap = (selector) ->
+#  @evaluate ->
+#    el = document.querySelector(selector)
+#    Hammer = hammer(el)
+#    console.log Hammer
+#    Hammer.trigger('tap', target: el)
+#    return
+#  return
 
 buildSteps = (scenario) ->
-  console.log common.criteriaList[scenario].steps
-  for st in common.criteriaList[scenario].steps
-    if common.criteriaList[st] and common.criteriaList[st].steps.length >= 1
+  console.log config.criteria[scenario].steps
+  for st in config.criteria[scenario].steps
+    if config.criteria[st] and config.criteria[st].steps.length >= 1
       buildSteps st
     else
       steps.push st
 
 buildSteps(scenario)
 
-ACfilename = common.setupScreenShotPath scenario, deviceType, userAgentType, width, height, false
-FPfilename = common.setupScreenShotPath scenario, deviceType, userAgentType, width, height, true
+ACfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentType, width, height, false
+FPfilename = common.utils.][setupScreenShotPath scenario, deviceType, userAgentType, width, height, true
 
 #set the userAgent from argument passed in
 casper.userAgent common.userAgents[deviceType][userAgentType]
@@ -81,7 +81,7 @@ fail = (c, step) ->
     height: height
   c.captureSelector common.dirFailure + FPfilename.replace(/\{step\}/g, currentStep + '-' + step) + '.png', 'body'
 
-  common.logWithTime scenario, step, ' snapshot taken after failure'
+  common.utils.logWithTime scenario, step, ' snapshot taken after failure'
   failedCount = failedCount + 1
   return
 
