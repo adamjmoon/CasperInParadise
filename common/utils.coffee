@@ -1,3 +1,5 @@
+growl = require('growl')
+
 utils =
   setupScreenShotPath: (scenario,deviceType,userAgentType,width,height, fullpage) ->
         path = if fullpage then self.dirScreenshotFullPage else self.dirScreenshotViewPort
@@ -11,6 +13,7 @@ utils =
 
   getCasperJsExec: () ->
     "./node_modules/.bin/casperjs"
+
   logWithTime : (scenario, step, action) ->
     if self.verbose
       timeStamp = new Date()
@@ -21,5 +24,11 @@ utils =
   logTimeToComplete: (scenario, step, start) ->
     console.log 'completed ' + step + ' step of  ' + scenario + ' in ' + ((new Date() - start) / 1000).toFixed(3).toString() + ' secs'
 
-console.log utils
+  growlMsg : (msg) ->
+      unless typeof (growl) is "undefined"
+        growl msg,
+          title: "STATUS UPDATE",
+          priority: 1
+
+
 module.exports = utils
