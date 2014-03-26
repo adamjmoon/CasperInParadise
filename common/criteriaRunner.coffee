@@ -5,16 +5,20 @@ cmd = require("./cmd.coffee")
 exp = {}
 workList = []
 
+processFilter = (proj, scenario, deviceType, cb) ->
+  if proj.criteriaList[ scenario ].filter
+    if proj.criteriaList[ scenario ].filter[ deviceType ]
+      setupWorkForScenario proj, scenario , deviceType , cb
+  else
+    setupWorkForScenario proj, scenario , deviceType , cb
+  return
+
 setupWorkForProjectAndDevice = ( proj , deviceType , scenario , cb ) ->
   if scenario
-    setupWorkForScenario proj, scenario , deviceType , cb
+    processFilter(proj, scenario, deviceType, cb)
   else
     for scenario of proj.criteriaList
-      if proj.criteriaList[ scenario ].filter
-        if proj.criteriaList[ scenario ].filter[ deviceType ]
-          setupWorkForScenario proj, scenario , deviceType , cb
-      else
-        setupWorkForScenario proj, scenario , deviceType , cb
+      processFilter(proj, scenario, deviceType, cb)
   return
 
 setupWorkForScenario = (proj, scenario , deviceType , cb ) ->

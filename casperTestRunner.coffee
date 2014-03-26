@@ -1,10 +1,10 @@
-require = patchRequire global.require
+#require = patchRequire global.require
 x = require('casper').selectXPath
 path = require 'path'
 casper = require('casper').create
     verbose: true
     logLevel: 'debug'
-    waitTimeout: 5000
+    waitTimeout: 10000
 requestedProject = casper.cli.get(0)
 projectPath = "projects/" + requestedProject + "/config.coffee"
 config = require(projectPath)
@@ -36,15 +36,11 @@ ACfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentTyp
 FPfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentType, width, height, true
 
 #set the userAgent from argument passed in
+console.log common.userAgents[deviceType][userAgentType]
 casper.userAgent common.userAgents[deviceType][userAgentType]
 
-casper.show = (selector) ->
-  @evaluate ((selector) ->
-    document.querySelector(selector).style.display = "block !important;"
-  ), selector
-
 pass = (c, step)->
-  console.log c.getHTML()
+  #console.log c.getHTML()
   c.capture common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
     left: 0
@@ -61,7 +57,7 @@ pass = (c, step)->
   return
 
 fail = (c, step) ->
-  console.log(step +' -> ' + '\n------------------------\n' + c.getHTML() + '\n-----------------------\n')
+  #console.log c.getHTML()
   
   c.capture common.dirFailure + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
@@ -77,20 +73,20 @@ fail = (c, step) ->
 currentStep = 0
 
 runSteps = (c) ->
-  
   if steps[currentStep]
     step = steps[currentStep]
-    stepScriptModule = projRoot + requestedProject + "/scenarios/" + step + common.scenarioScriptExt
+    stepScriptModule = "projects/" + requestedProject + "/scenarios/" + step + '.coffee'
     stepToRun = require(stepScriptModule)
     common.utils.logWithTime(scenario, currentStep + 1, ' run')
-    stepToRun c, scenario, step, config, pass, fail, x
+    stepToRun c, scenario, step, config, pass, fail
     currentStep++
   return
 
-console.log config.url
 casper.start config.url
 
 casper.then ->
+  console.log width
+  console.log height
   @viewport width, height
   return
 
@@ -100,7 +96,7 @@ casper.then ->
   return
 
 exitCode = ->
-  successCount*10 + failedCount
+  return successCount*10 + failedCount
 
 casper.run ->
   exitCode = successCount*10 + failedCount

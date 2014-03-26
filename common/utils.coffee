@@ -1,7 +1,7 @@
 utils =
   setupScreenShotPath: (scenario,deviceType,userAgentType,width,height, fullpage) ->
-    dirScreenshotViewPort = '{scenario}/{deviceType}/{userAgentType}/{width}x{height}/STEP-{step}'
-    dirScreenshotFullPage = '{scenario}/{deviceType}/{userAgentType}/FULLPAGE/{width}x{height}/STEP-{step}'
+    dirScreenshotViewPort = '{scenario}/{deviceType}.{userAgentType}.{width}x{height}/STEP-{step}'
+    dirScreenshotFullPage = dirScreenshotViewPort+'-FP'
     path = if fullpage then dirScreenshotFullPage else dirScreenshotViewPort
     path = path.replace('{scenario}', scenario)
       .replace('{deviceType}', deviceType)
@@ -9,9 +9,6 @@ utils =
       .replace('{width}', width)
       .replace('{height}', height)
     path
-    return
-
-
     
   logWithTime : (scenario, step, action) ->
     if self.verbose

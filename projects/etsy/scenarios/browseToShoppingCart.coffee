@@ -1,5 +1,5 @@
 module.exports = (casper, scenario, step, c, p, t) ->
-  url = c.url+'/search?q=knives&ship_to=US'
+  url = c.url+'/cart?ref=so_cart'
   casper.thenOpen url,( ->
     casper.waitForUrl url, ( ->
         casper.then ->

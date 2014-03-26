@@ -36,8 +36,6 @@ module.exports = (grunt) ->
         console.error e  # something went wrong
       return
     return
-    
-
 
   grunt.registerTask 'default', ['clean', 'testAcceptanceCriteria']
 

@@ -19,6 +19,10 @@ c["browseToHome_phone"] =
 c["searchForProduct"] =
   filter: filters.phone
   steps: ['browseToHome_phone','searchFor']
+  
+c["browseToCart"] =
+  filter: filters.phone
+  steps: ['browseToHome_phone','searchFor','browseToShoppingCart']
 
 
 module.exports = c
