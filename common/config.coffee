@@ -1,11 +1,8 @@
 config = ->
   #   casper runner config properties
     @browserEngine = 'phantomjs'
-  #    @browserEngine = 'slimerjs'
-  #  @verbose = false
     @verbose = true
     @logThreshold = 'error'
-  #  @logThreshold = 'error'
     @scenarioScriptExt = '.coffee'
     @generatePdf = false
     @scrapeHtml = true
@@ -15,8 +12,6 @@ config = ->
     @dirFailure = "./RESULTS/{project}/FAILURE/"
     @pdfResults = "./RESULTS/{project}/"
     @includeFullPage = true
-    @dirScreenshotViewPort = '{scenario}/{deviceType}/{userAgentType}/{width}x{height}/STEP-{step}'
-    @dirScreenshotFullPage = '{scenario}/{deviceType}/{userAgentType}/FULLPAGE/{width}x{height}/STEP-{step}'
     @passedColor = "#00FF00"
     @failedColor="#8A0808"
     
@@ -28,7 +23,6 @@ config = ->
         self.dirFailure = self.dirFailure.replace('{project}', project)
         self.pdfResults = self.pdfResults.replace('{project}', project)
         self.projPath = '../../projects/' + project + '/'
-        self.path = './projects/' + project + '/'
         self.currentProject = project
       return
     

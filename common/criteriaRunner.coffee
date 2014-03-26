@@ -26,52 +26,54 @@ setupWorkForScenario = (proj, scenario , deviceType , cb ) ->
                common.viewPorts[ deviceType ].list[ i ][ 1 ] ]
       # pass type of device or browser
       args.push userAgentType
+      args.push __dirname.replace('common','projects/')
       # pass actual userAgent string
       args.push '--engine=' + common.browserEngine
-      workList.push async.apply( cmd , common.utils.getCasperJsExec() , args , cb )
+      
+      workList.push async.apply( cmd , './node_modules/.bin/casperjs', args , cb )
     i++
   return
 
-queueWork = ( project , deviceType , scenario, callback) ->
+queueWork = ( project , deviceType , scenario, cb, callback) ->
   proj = require( '../projects/' + project + '/config.coffee' )
-  console.log proj
+  
 #     SETUP WORK LIST FIRST
   if deviceType
-    setupWorkForProjectAndDevice( proj , deviceType , scenario , callback ) if common.viewPorts[ deviceType ].active
+    setupWorkForProjectAndDevice( proj , deviceType , scenario , cb ) if common.viewPorts[ deviceType ].active
     callback(null, workList)
   else
-    setupWorkForProjectAndDevice( proj , 'phone' , scenario , callback ) if common.viewPorts.phone.active
-    setupWorkForProjectAndDevice( proj , 'tablet' , scenario , callback ) if common.viewPorts.tablet.active
-    setupWorkForProjectAndDevice( proj , 'desktop' , scenario , callback ) if common.viewPorts.desktop.active
+    setupWorkForProjectAndDevice( proj , 'phone' , scenario , cb ) if common.viewPorts.phone.active
+    setupWorkForProjectAndDevice( proj , 'tablet' , scenario , cb ) if common.viewPorts.tablet.active
+    setupWorkForProjectAndDevice( proj , 'desktop' , scenario , cb ) if common.viewPorts.desktop.active
     callback(null, workList)
   return
 
 #     NOW PROCESS THE WORK LIST IN PARALLEL
-exp.runInParallel = (project , deviceType , scenario, cb) ->
-  console.log(project)
-  Sync ->
-    console.log(project)
-    work = queueWork.sync(null, project, deviceType, scenario)
-    cnt = 0
-    startTime = Date.now()
-    callback = ( err , results ) ->
-      cnt = cnt + 1
-      if cnt == workList.length
-        endTime = Date.now()
-        successMsg = 'PASSED STEPS: ' + successCount
-        failedMsg = ''
-        if failedCount > 0
-          failedMsg = "FAILED STEPS: " + failedCount
-        doneMsg = common.utils.getCasperJsExec() + ' COMPLETED for all criteria in : ' + ((endTime - startTime) / 1000).toFixed( 3 ).toString() + ' seconds'
-        common.utils.growlMsg( doneMsg )
-        console.log doneMsg.cyan
-        console.log successMsg.green
-        if failedMsg.length > 0
-          console.log failedMsg.red
-        cb()
+exp.run = (project , deviceType , scenario, cb) ->
+  cnt = 0
+  startTime = Date.now()
+  callback = ( err ) ->
+    cnt = cnt + 1
+    if cnt == workList.length
+      endTime = Date.now()
+      successMsg = 'PASSED STEPS: ' + successCount
+      failedMsg = ''
+      if failedCount > 0
+        failedMsg = "FAILED STEPS: " + failedCount
+      doneMsg = common.utils.getCasperJsExec() + ' COMPLETED for all criteria in : ' + ((endTime - startTime) / 1000).toFixed( 3 ).toString() + ' seconds'
+      #common.utils.growlMsg( doneMsg )
+      console.log doneMsg.cyan
+      console.log successMsg.green
+      if failedMsg.length > 0
+        console.log failedMsg.red
+      cb(null, true)
+  
+  try
+    work = queueWork.sync(null, project, deviceType, scenario, callback)
     console.log(work)
-    return work
+    result = async.parallel.sync null, work
+  catch e
+    console.error e  # something went wrong
   return
-
 
 module.exports = exp

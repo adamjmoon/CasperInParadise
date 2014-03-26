@@ -1,22 +1,21 @@
 require = patchRequire global.require
 x = require('casper').selectXPath
-
-console.log "here"
+path = require 'path'
 casper = require('casper').create
     verbose: true
     logLevel: 'debug'
     waitTimeout: 5000
 requestedProject = casper.cli.get(0)
-common = require "./common/config.coffee"
-config = require "./projects/" + requestedProject +"/config.coffee"
+projectPath = "projects/" + requestedProject + "/config.coffee"
+config = require(projectPath)
+common = require("common/config.coffee")
 scenario = casper.cli.get(1)
+console.log scenario
 deviceType = casper.cli.get(2)
 width = casper.cli.get(3)
 height = casper.cli.get(4)
 userAgentType = casper.cli.get(5)
-hammer = undefined
-
-url = common.proj.url
+projRoot = casper.cli.get(6)
 
 steps = []
 successCount = 0
@@ -24,19 +23,9 @@ failedCount = 0
 successImgPath = ''
 failureImgPath = ''
 
-#casper.tap = (selector) ->
-#  @evaluate ->
-#    el = document.querySelector(selector)
-#    Hammer = hammer(el)
-#    console.log Hammer
-#    Hammer.trigger('tap', target: el)
-#    return
-#  return
-
 buildSteps = (scenario) ->
-  console.log config.criteria[scenario].steps
-  for st in config.criteria[scenario].steps
-    if config.criteria[st] and config.criteria[st].steps.length >= 1
+  for st in config.criteriaList[scenario].steps
+    if config.criteriaList[st] and config.criteriaList[st].steps.length >= 1
       buildSteps st
     else
       steps.push st
@@ -44,7 +33,7 @@ buildSteps = (scenario) ->
 buildSteps(scenario)
 
 ACfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentType, width, height, false
-FPfilename = common.utils.][setupScreenShotPath scenario, deviceType, userAgentType, width, height, true
+FPfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentType, width, height, true
 
 #set the userAgent from argument passed in
 casper.userAgent common.userAgents[deviceType][userAgentType]
@@ -66,7 +55,7 @@ pass = (c, step)->
   then c.captureSelector common.dirSuccess + FPfilename.replace(/{step}/g, currentStep + '-' + step) + '.png', 'html'
 
 
-  common.logWithTime scenario, step, ' snapshot taken after pass'
+  common.utils.logWithTime scenario, step, ' snapshot taken after pass'
   successCount = successCount + 1
   runSteps c
   return
@@ -91,18 +80,18 @@ runSteps = (c) ->
   
   if steps[currentStep]
     step = steps[currentStep]
-    stepToRun = require common.path + "scenarios/" + step + common.scenarioScriptExt
-    common.logWithTime(scenario, currentStep + 1, ' run')
-    stepToRun.run c, scenario, step, common, pass, fail, x
+    stepScriptModule = projRoot + requestedProject + "/scenarios/" + step + common.scenarioScriptExt
+    stepToRun = require(stepScriptModule)
+    common.utils.logWithTime(scenario, currentStep + 1, ' run')
+    stepToRun c, scenario, step, config, pass, fail, x
     currentStep++
   return
 
-casper.start url
+console.log config.url
+casper.start config.url
 
 casper.then ->
   @viewport width, height
-  hammer = require "./node_modules/hammerjs/hammer.js"
-  
   return
 
 casper.then ->

@@ -4,7 +4,6 @@ module.exports = (grunt) ->
   colors = require('colors')
   _ = require('lodash')
   path = require('path')
-  criteriaRunner = require('./common/criteriaRunner.coffee')
   common = require "./common/config.coffee"
   stats = require "./common/stats.coffee"
   stats.failures = 1
@@ -23,27 +22,21 @@ module.exports = (grunt) ->
 
   # Configure Grunt
   grunt.initConfig
-    clean: {options: {force: true}, all: ['results', 'logs']}
+    clean: {options: {force: true}, all: ['results/'+common.currentProject+'/*', 'logs/*.log']}
 
   grunt.registerTask 'testAcceptanceCriteria', 'RUN ALL CRITERIA', () ->
-    asyncFunction = (a, b, callback) ->
-      process.nextTick ->
-        callback null, a + b
-        return
-
-      return
 
     # Run in a fiber
     Sync ->
+      criteriaRunner = require('./common/criteriaRunner.coffee')
       # Function.prototype.sync() interface is same as Function.prototype.call() - first argument is 'this' context
-      result = asyncFunction.sync(null, 2, 3)
-      console.log result # 5
-
-      work = criteriaRunner.runInParallel.sync(null, common.currentProject, argDeviceType, argScenario)
-      console.log work
-      async.parallel.sync null, work, callback
-
-    return this.async()
+      try
+        result = criteriaRunner.run.sync(null, common.currentProject, argDeviceType, argScenario)
+      catch e
+        console.error e  # something went wrong
+      return
+    return
+    
 
 
   grunt.registerTask 'default', ['clean', 'testAcceptanceCriteria']
