@@ -1,5 +1,5 @@
 module.exports = (casper, c) ->
-  casper.waitUntilVisible c.proj.selectors.signIn, ( ->
+  casper.waitUntilVisible c.selectors.signIn, ( ->
     casper.then ->
       c.pass(casper, c.step)
       return

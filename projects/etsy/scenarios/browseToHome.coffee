@@ -1,4 +1,4 @@
-module.exports = (casper, scenario, step, c, p, t) ->
+module.exports = (casper, c) ->
   casper.waitUntilVisible c.selectors.shopName, (->
     casper.then ->
       p casper, step

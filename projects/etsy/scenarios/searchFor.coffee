@@ -1,6 +1,6 @@
 module.exports = (casper, c) ->
-  casper.thenOpen c.proj.url+c.proj.routes.searchFor,( ->
-    casper.waitForUrl c.proj.routes.searchFor, ( ->
+  casper.thenOpen c.url+c.routes.searchFor,( ->
+    casper.waitForUrl c.routes.searchFor, ( ->
         casper.then ->
           c.pass(casper, c.step)
           return

@@ -28,12 +28,10 @@ module.exports = (grunt) ->
 
     # Run in a fiber
     Sync ->
-      criteriaRunner = require('./common/criteriaRunner.coffee')
+      criteriaRunner = require('./criteriaRunner.coffee')
       # Function.prototype.sync() interface is same as Function.prototype.call() - first argument is 'this' context
       try
-        work = criteriaRunner.run(common.currentProject, argDeviceType, argScenario)
-        console.log work
-        async.parallel work.list, work.callback
+        result = criteriaRunner.run.sync(null, common.currentProject, argDeviceType, argScenario)
       catch e
         console.error e  # something went wrong
       return
