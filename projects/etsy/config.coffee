@@ -2,7 +2,8 @@
 c = {}
 c.name = 'etsy'
 c.selectors = require './selectors.coffee'
+c.routes = require './routes.coffee'
 c.criteriaList = require './criteriaList.coffee'
-c.url = 'http://www.etsy.com'
+c.url = 'https://www.etsy.com'
 
 module.exports = c

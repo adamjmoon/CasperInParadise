@@ -53,7 +53,7 @@ queueWork = ( project , deviceType , scenario, cb, callback) ->
   return
 
 #     NOW PROCESS THE WORK LIST IN PARALLEL
-exp.run = (project , deviceType , scenario, cb) ->
+exp.run = ((project , deviceType , scenario, cb) ->
   cnt = 0
   startTime = Date.now()
   callback = ( err ) ->
@@ -74,10 +74,10 @@ exp.run = (project , deviceType , scenario, cb) ->
   
   try
     work = queueWork.sync(null, project, deviceType, scenario, callback)
-    console.log(work)
-    result = async.parallel.sync null, work
+    
+    
   catch e
     console.error e  # something went wrong
-  return
-
+  return { list: work, callback: callback }
+).async()
 module.exports = exp

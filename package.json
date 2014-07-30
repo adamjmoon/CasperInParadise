@@ -10,8 +10,5 @@
     "colors" : "latest",
     "casperjs" : "latest",
     "grunt-contrib-clean": "latest"
-  },
-    "scripts": {
-      "preinstall": "npm i -g grunt-cli"
-    }
+  }
 }

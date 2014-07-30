@@ -5,43 +5,44 @@ doc = undefined
 pdfHelper =
   getDoc : ->
     return doc
-  create : (width, height) ->
+  create : (options) ->
     doc = new PDF
               size:
-                [width, height]
+                [options.width, options.height+25]
+    doc.fontSize(18)
+    doc.write options.pdfPath
 
-
-  appendToPDF :(path, failed, cb) ->
-      if (fs.existsSync(path))
-        doc.fontSize(18)
+  appendToPDF :(options, cb) ->
+      if (fs.existsSync(options.pdfPath))
+        
         files = fs.readdirSync path
         files = _.sortBy files
         text = ''
         stepDesc
         stepNum
         j = 0
-        imgPath = ''
         headerHeight = 0
-        while j < files.length
-          stepNum =  files[j].replace(/(STEP-)(.*)-(.*)(\.png)/,'$2')
-          stepDesc =  files[j].replace(/(STEP-)(.*)-(.*)(\.png)/,'$3')
-          imgPath = path + files[j]
-          text =   "#"+ stepNum + ': ' + stepDesc
+        
+        
+        text =   "#"+ stepNum + ': ' + stepDesc
 
-          doc.addPage()
+        doc.addPage()
 
-          doc.text(text,20,headerHeight + 5)
-            .highlight(0, 0, doc.page.width+5, 25)
-            .circle(10,11+headerHeight, 7)
-            .lineWidth(1)
-          if failed
-             doc.fillAndStroke("#FE2E2E", common.failedColor)
-          else
-             doc.fillAndStroke("#00FF00", "green")
-          doc.rect(0,headerHeight + 22, doc.page.width, 3).fillAndStroke("black", "#000000")
-          doc.image(imgPath, 0, headerHeight + 25 )
-          j++
-      cb()
-      doc
+        doc.text(text,20,headerHeight + 5)
+          .highlight(0, 0, doc.page.width+5, 25)
+          .circle(10,11+headerHeight, 7)
+          .lineWidth(1)
+        if failed
+           doc.fillAndStroke("#FE2E2E", common.failedColor)
+        else
+           doc.fillAndStroke("#00FF00", "green")
+        doc.rect(0,headerHeight + 22, doc.page.width, 3).fillAndStroke("black", "#000000")
+        doc.image(options.imgPath, 0, headerHeight + 25 )
+        j++
+      else
+        
+      if cb
+        cb()
+      doc.write options.pdfPath
 
 module.exports = pdfHelper

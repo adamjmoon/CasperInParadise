@@ -10,7 +10,7 @@ config = ->
     @timeout = 5000
     @dirSuccess = "./RESULTS/{project}/SUCCESS/"
     @dirFailure = "./RESULTS/{project}/FAILURE/"
-    @pdfResults = "./RESULTS/{project}/"
+    @pdfResults = "./RESULTS/{project}/{scenario}"
     @includeFullPage = true
     @passedColor = "#00FF00"
     @failedColor="#8A0808"
@@ -22,7 +22,6 @@ config = ->
         self.dirSuccess = self.dirSuccess.replace('{project}', project)
         self.dirFailure = self.dirFailure.replace('{project}', project)
         self.pdfResults = self.pdfResults.replace('{project}', project)
-        self.projPath = '../../projects/' + project + '/'
         self.currentProject = project
       return
     

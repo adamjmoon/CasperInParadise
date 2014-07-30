@@ -1,12 +1,13 @@
-module.exports = (casper, scenario, step, c, p, t) ->
-  url = c.url+'/search?q=knives&ship_to=US'
-  casper.thenOpen url,( ->
-    casper.waitForUrl url, ( ->
+module.exports = (casper, c) ->
+  casper.thenOpen c.proj.url+c.proj.routes.searchFor,( ->
+    casper.waitForUrl c.proj.routes.searchFor, ( ->
         casper.then ->
-          p(casper, step)
+          c.pass(casper, c.step)
+          return
     ), ->
       casper.then ->
-        t(casper, step)
+        this.echo(this.getCurrentUrl())
+        c.fail(casper, c.step)
         return
   )
   return

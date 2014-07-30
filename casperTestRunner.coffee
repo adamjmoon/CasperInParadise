@@ -1,4 +1,5 @@
 #require = patchRequire global.require
+
 x = require('casper').selectXPath
 path = require 'path'
 casper = require('casper').create
@@ -22,6 +23,15 @@ successCount = 0
 failedCount = 0
 successImgPath = ''
 failureImgPath = ''
+casper.tap = (selector) ->
+  @evaluate ->
+    el = document.querySelector(selector)
+    Hammer = hammer(el)
+    console.log Hammer
+    Hammer.trigger('tap', target: el)
+    return
+  return
+
 
 buildSteps = (scenario) ->
   for st in config.criteriaList[scenario].steps
@@ -39,46 +49,51 @@ FPfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentTyp
 console.log common.userAgents[deviceType][userAgentType]
 casper.userAgent common.userAgents[deviceType][userAgentType]
 
-pass = (c, step)->
+imgPath = ""
+pass = (casper, step)->
   #console.log c.getHTML()
-  c.capture common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
+  imgPath = common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png'
+  casper.capture imgPath,
     top: 0
     left: 0
     width: width
     height: height
+    
+  
 
   if common.includeFullPage 
-  then c.captureSelector common.dirSuccess + FPfilename.replace(/{step}/g, currentStep + '-' + step) + '.png', 'html'
-
-
+  then casper.captureSelector common.dirSuccess + FPfilename.replace(/{step}/g, currentStep + '-' + step) + '.png', 'html'
+  
   common.utils.logWithTime scenario, step, ' snapshot taken after pass'
   successCount = successCount + 1
-  runSteps c
+  runSteps casper
   return
 
-fail = (c, step) ->
+fail = (casper, step) ->
   #console.log c.getHTML()
   
-  c.capture common.dirFailure + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
+  casper.capture common.dirFailure + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
     left: 0
     width: width
     height: height
-  c.captureSelector common.dirFailure + FPfilename.replace(/\{step\}/g, currentStep + '-' + step) + '.png', 'body'
+  casper.captureSelector common.dirFailure + FPfilename.replace(/\{step\}/g, currentStep + '-' + step) + '.png', 'body'
 
   common.utils.logWithTime scenario, step, ' snapshot taken after failure'
   failedCount = failedCount + 1
   return
 
 currentStep = 0
+stepConfig = {proj : config, pass : pass, fail : fail}
+caspertUtils = require('common/casperUtils.coffee')             
 
-runSteps = (c) ->
+runSteps = (casper) ->
   if steps[currentStep]
     step = steps[currentStep]
-    stepScriptModule = "projects/" + requestedProject + "/scenarios/" + step + '.coffee'
+    stepScriptModule = "projects/" + requestedProject + "/scenarios/" + step + common.scenarioScriptExt
     stepToRun = require(stepScriptModule)
-    common.utils.logWithTime(scenario, currentStep + 1, ' run')
-    stepToRun c, scenario, step, config, pass, fail
+    stepConfig.step = step
+    stepToRun casper, stepConfig, caspertUtils
     currentStep++
   return
 
@@ -91,7 +106,6 @@ casper.then ->
   return
 
 casper.then ->
-  console.log steps
   runSteps casper
   return
 

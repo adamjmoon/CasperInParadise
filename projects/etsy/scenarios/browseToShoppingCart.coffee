@@ -10,3 +10,19 @@ module.exports = (casper, scenario, step, c, p, t) ->
         return
   )
   return
+
+
+module.exports = (casper, c) ->
+  route = '/cart?ref=so_cart'
+  casper.thenOpen c.proj.url+route,( ->
+    casper.waitForUrl route, ( ->
+        casper.then ->
+          c.pass(casper, step)
+          return
+    ), ->
+      casper.then ->
+        this.echo(this.getCurrentUrl())
+        c.fail(casper, step)
+        return
+  )
+  return

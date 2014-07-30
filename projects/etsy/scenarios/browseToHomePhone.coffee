@@ -1,12 +1,12 @@
-module.exports = (casper, scenario, step, c, p, t) ->
-  casper.waitUntilVisible c.selectors.signIn, ( ->
+module.exports = (casper, c) ->
+  casper.waitUntilVisible c.proj.selectors.signIn, ( ->
     casper.then ->
-      p(casper, step)
+      c.pass(casper, c.step)
       return
     return
   ), ->
     casper.then ->
-      t(casper, step)
+      c.fail(casper, c.step)
       return
     return
   return
