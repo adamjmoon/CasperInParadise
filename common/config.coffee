@@ -1,7 +1,7 @@
 config = ->
   #   casper runner config properties
     @browserEngine = 'phantomjs'
-    @verbose = true
+    @verbose = false
     @logThreshold = 'error'
     @scenarioScriptExt = '.coffee'
     @generatePdf = false

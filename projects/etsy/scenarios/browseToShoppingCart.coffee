@@ -3,12 +3,12 @@ module.exports = (casper, c) ->
   casper.thenOpen c.url+route,( ->
     casper.waitForUrl route, ( ->
         casper.then ->
-          c.pass(casper, step)
+          c.pass(casper, c.step)
           return
     ), ->
       casper.then ->
         this.echo(this.getCurrentUrl())
-        c.fail(casper, step)
+        c.fail(casper, c.step)
         return
   )
   return

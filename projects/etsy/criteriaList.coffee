@@ -3,7 +3,7 @@ filters = require '../../common/deviceTypeFilters.coffee'
 #    common criteria list
 c = {}
 c["browseToHome"] =
-  filter: filters.tablet_desktop
+  filter: filters.desktop
   bdd:
     GIVEN: 'Browsed to etsy store'
     THEN: 'store title should be visible'

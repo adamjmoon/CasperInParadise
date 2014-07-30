@@ -1,6 +1,6 @@
 module.exports = (casper, c) ->
   casper.waitUntilVisible c.selectors.shopName, (->
     casper.then ->
-      p casper, step
+      c.pass casper, c.step
   ), ->
-    t casper, step
+    c.fail casper, c.step

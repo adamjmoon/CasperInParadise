@@ -9,8 +9,7 @@ ua.phone.iPhone5="Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) A
 ua.tablet.iPadSafari="Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.10"
 
 # desktop user agents
-ua.desktop.ChromeDesktop="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.151 Safari/535.19"
-ua.desktop.SafariDesktop="cd /5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.53.11 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10"
+ua.desktop.ChromeDesktop="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
 
 #  return userAgent object
 module.exports =  ua

@@ -1,4 +1,4 @@
-#require = patchRequire global.require
+require = patchRequire global.require
 x = require('casper').selectXPath
 path = require 'path'
 casper = require('casper').create
@@ -6,15 +6,15 @@ casper = require('casper').create
     logLevel: 'debug'
     waitTimeout: 10000
 requestedProject = casper.cli.get(0)
-projectPath = "projects/" + requestedProject + "/config.coffee"
+projectPath = "./projects/" + requestedProject + "/config.coffee"
 config = require(projectPath)
 common = require("common/config.coffee")
 scenario = casper.cli.get(1)
-console.log scenario
 deviceType = casper.cli.get(2)
 width = casper.cli.get(3)
 height = casper.cli.get(4)
 userAgentType = casper.cli.get(5)
+
 projRoot = casper.cli.get(6)
 
 steps = []
@@ -25,22 +25,27 @@ failureImgPath = ''
 
 buildSteps = (scenario) ->
   for st in config.criteriaList[scenario].steps
-    if config.criteriaList[st] and config.criteriaList[st].steps.length >= 1
+    if config.criteriaList[st] and config.criteriaList[st].steps.length > 1
       buildSteps st
     else
       steps.push st
+      console.log steps
 
+console.log scenario
 buildSteps(scenario)
 
 ACfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentType, width, height, false
 FPfilename = common.utils.setupScreenShotPath scenario, deviceType, userAgentType, width, height, true
 
 #set the userAgent from argument passed in
+
 console.log common.userAgents[deviceType][userAgentType]
 casper.userAgent common.userAgents[deviceType][userAgentType]
 
 pass = (c, step)->
-  #console.log c.getHTML()
+  console.log '--------------- ' + step + ' ----------------\n'
+  console.log c.getHTML()
+  console.log '--------------- ' + step + ' ----------------\n'
   c.capture common.dirSuccess + ACfilename.replace(/{step}/g, currentStep + '-' + step) + '.png',
     top: 0
     left: 0
@@ -51,7 +56,7 @@ pass = (c, step)->
   then c.captureSelector common.dirSuccess + FPfilename.replace(/{step}/g, currentStep + '-' + step) + '.png', 'html'
 
 
-  common.utils.logWithTime scenario, step, ' snapshot taken after pass'
+#  common.utils.logWithTime scenario, step, ' snapshot taken after pass'
   successCount = successCount + 1
   runSteps c
   return
@@ -73,15 +78,19 @@ fail = (c, step) ->
 currentStep = 0
 
 runSteps = (c) ->
-  if steps[currentStep]
-    step = steps[currentStep]
-    stepScriptModule = "projects/" + requestedProject + "/scenarios/" + step + '.coffee'
-    stepToRun = require(stepScriptModule)
-    common.utils.logWithTime(scenario, currentStep + 1, ' run')
-    config.step = step
-    
-    stepToRun c, config
-    currentStep++
+  if steps[currentStep]?
+    try
+      step = steps[currentStep]
+      stepScriptModule = "projects/" + requestedProject + "/scenarios/" + step + '.coffee'
+      stepToRun = require(stepScriptModule)
+      common.utils.logWithTime(scenario, currentStep + 1, ' run')
+      config.step = step
+
+      stepToRun c, config
+      currentStep++
+    catch ex
+      console.log ex
+
   return
 
 casper.start config.url

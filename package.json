@@ -1,6 +1,6 @@
 {
   "name": "CasperParallel",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "dependencies": {
     "growl": "1.7.0",
     "grunt": "0.4.4",
@@ -8,7 +8,7 @@
     "lodash" : "0.9.2",
     "pdfkit" : "0.5.2",
     "colors" : "0.6.2",
-    "casperjs" : "1.1.0",
+    "casperjs" : "1.1.0-beta3",
     "grunt-contrib-clean": "0.5.0",
     "path": "0.4.9",
     "sync": "0.2.2"
